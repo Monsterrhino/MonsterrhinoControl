@@ -173,6 +173,18 @@ pre code {
 <div id="prepare-your-raspberry-pi-4-for-using-with-monsterrhino-control" class="section level1">
 <h1>Prepare your Raspberry Pi 4 for using with Monsterrhino Control</h1>
 <p>Download Raspberry Pi Desktop from <a href="https://www.raspberrypi.org/software/raspberry-pi-desktop/" class="uri">https://www.raspberrypi.org/software/raspberry-pi-desktop/</a>. Make sure you have a version that is supported by the touch display driver (<a href="https://4dsystems.com.au/gen4-4dpi-50ct-clb" class="uri">https://4dsystems.com.au/gen4-4dpi-50ct-clb</a>). Use a program of your choice (e.g. BalenaEtcher) to burn the Raspberry Pi Destop image to a SD card.</p>
+<p>Depending on what you need you can either install both, display driver and CAN driver, or just the one you need.</p>
+<div id="install-gen4-4dpi-50ct-clb-display-driver" class="section level3">
+<h3>Install <strong>gen4-4dpi-50ct-clb</strong> display driver</h3>
+<p>The 5&quot; display is manifactured by 4D Systems, the product number is: GEN4-4DPi-50CT-CLB. The install instruction can be found here: <a href="https://4dsystems.com.au/mwdownloads/download/link/id/198/" class="uri">https://4dsystems.com.au/mwdownloads/download/link/id/198/</a></p>
+<p>Different versions are available here: <a href="https://4dsystems.com.au/gen4-4dpi-50ct-clb" class="uri">https://4dsystems.com.au/gen4-4dpi-50ct-clb</a></p>
+<p>The instruction contains the download link to the install package: <a href="https:/4dsystems.com.au/media/downloads/4DPi/All/gen4-hats_4-19-97.tar.gz" class="uri">https:/4dsystems.com.au/media/downloads/4DPi/All/gen4-hats_4-19-97.tar.gz</a></p>
+<p>Download this package to the host PC, make sure the kernel of your Raspian matches the driver (e.g. 4-19-97). To check the kernel on your Raspian system type: uname -a</p>
+<p>Now we want to send the downloaded package to the Raspberry Pi. To do so navigate on the host PC to the download section and enter following into the terminal:</p>
+<p>scp gen4-hats_4-19-97.tar.gz <a href="mailto:pi@192.168.32.111" class="email">pi@192.168.32.111</a>:/home/pi</p>
+<p>On the remote SSH terminal navigate to cd /home/pi and enter sudo tar -xzvf gen4-hats_4-19-97.tar.gz -C /</p>
+<p>After installation poweroff the Raspberry Pi by typing: sudo poweroff. Disconnect from power and connect the display as instructed by the manual and restart the the Raspberry Pi. Now you should see the terminal on the 5&quot; display.</p>
+</div>
 <div id="install-can-bus-driver-on-spi2" class="section level3">
 <h3>Install CAN bus driver on SPI2</h3>
 <p>This step should be performed after installing the display driver, make sure you have the IP address of the Raspberry Pi, because after installing the display driver the HDMI will not work anymore, and you need to access the RPi via SSH (enable SSH first). Idea from <a href="http://www.industrialberry.com/quad-can-bus-adapter-raspberry-canberry/" class="uri">http://www.industrialberry.com/quad-can-bus-adapter-raspberry-canberry/</a>, uncompiled files can be downloade there (also in the rpi_py_tc package):</p>

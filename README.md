@@ -4,6 +4,26 @@
 
 Download Raspberry Pi Desktop from https://www.raspberrypi.org/software/raspberry-pi-desktop/. Make sure you have a version that is supported by the touch display driver (https://4dsystems.com.au/gen4-4dpi-50ct-clb). Use a program of your choice (e.g. BalenaEtcher) to burn the Raspberry Pi Destop image to a SD card.
 
+Depending on what you need you can either install both, display driver and CAN driver, or just the one you need.
+
+### Install **gen4-4dpi-50ct-clb** display driver 
+
+The 5" display is manifactured by 4D Systems, the product number is: GEN4-4DPi-50CT-CLB. The install instruction can be found here: https://4dsystems.com.au/mwdownloads/download/link/id/198/
+
+Different versions are available here: https://4dsystems.com.au/gen4-4dpi-50ct-clb
+
+The instruction contains the download link to the install package: https:/4dsystems.com.au/media/downloads/4DPi/All/gen4-hats_4-19-97.tar.gz
+
+Download this package to the host PC, make sure the kernel of your Raspian matches the driver (e.g. 4-19-97). To check the kernel on your Raspian system type: uname -a
+
+Now we want to send the downloaded package to the Raspberry Pi. To do so navigate on the host PC to the download section and enter following into the terminal:
+
+scp gen4-hats_4-19-97.tar.gz pi@192.168.32.111:/home/pi
+
+On the remote SSH terminal navigate to cd /home/pi and enter sudo tar -xzvf gen4-hats_4-19-97.tar.gz -C /
+
+After installation poweroff the Raspberry Pi by typing: sudo poweroff. Disconnect from power and connect the display as instructed by the manual and restart the the Raspberry Pi. Now you should see the terminal on the 5" display.
+
 ### Install CAN bus driver on SPI2
 
 This step should be performed after installing the display driver, make sure you have the IP address of the Raspberry Pi, because after installing the display driver the HDMI will not work anymore, and you need to access the RPi via SSH (enable SSH first). Idea from http://www.industrialberry.com/quad-can-bus-adapter-raspberry-canberry/, uncompiled files can be downloade there (also in the rpi_py_tc package):
