@@ -2,38 +2,111 @@
 
 # Prepare your Raspberry Pi 4 for using with Monsterrhino Control 
 
-Download Raspberry Pi Desktop from https://www.raspberrypi.org/software/raspberry-pi-desktop/. Make sure you have a version that is supported by the touch display driver (https://4dsystems.com.au/gen4-4dpi-50ct-clb). Use a program of your choice (e.g. BalenaEtcher) to burn the Raspberry Pi Destop image to a SD card.
+Download Raspberry Pi Desktop from https://www.raspberrypi.org/software/raspberry-pi-desktop/. Make sure you have a version that is supported by the touch display driver (https://4dsystems.com.au/gen4-4dpi-50ct-clb). Use a program of your choice (e.g. Raspberry Pi Imager, BalenaEtcher - **attention your image might not work due to the choosen software to burn the image!**) to burn the Raspberry Pi Destop image to a SD card.
 
 Depending on what you need you can either install both, display driver and CAN driver, or just the one you need.
 
-### Install **gen4-4dpi-50ct-clb** display driver 
+## Install Monsterrhino RGB LED
 
-The 5" display is manifactured by 4D Systems, the product number is: GEN4-4DPi-50CT-CLB. The install instruction can be found here: https://4dsystems.com.au/mwdownloads/download/link/id/198/
-
-Different versions are available here: https://4dsystems.com.au/gen4-4dpi-50ct-clb
-
-The instruction contains the download link to the install package: https:/4dsystems.com.au/media/downloads/4DPi/All/gen4-hats_4-19-97.tar.gz
-
-Download this package to the host PC, make sure the kernel of your Raspian matches the driver (e.g. 4-19-97). To check the kernel on your Raspian system type: uname -a
-
-Now we want to send the downloaded package to the Raspberry Pi. To do so navigate on the host PC to the download section and enter following into the terminal:
-
-scp gen4-hats_4-19-97.tar.gz pi@192.168.32.111:/home/pi
-
-On the remote SSH terminal navigate to cd /home/pi and enter sudo tar -xzvf gen4-hats_4-19-97.tar.gz -C /
-
-After installation poweroff the Raspberry Pi by typing: sudo poweroff. Disconnect from power and connect the display as instructed by the manual and restart the the Raspberry Pi. Now you should see the terminal on the 5" display.
-
-### Install CAN bus driver on SPI2
-
-This step should be performed after installing the display driver, make sure you have the IP address of the Raspberry Pi, because after installing the display driver the HDMI will not work anymore, and you need to access the RPi via SSH (enable SSH first). Idea from http://www.industrialberry.com/quad-can-bus-adapter-raspberry-canberry/, uncompiled files can be downloade there (also in the rpi_py_tc package):
-
+To enable the use of your Monsterrhino RGB LED in compination with the Monsterrhino Contorl run following commands in a terminal to install the necessary packages:
 
 ```C++
-mcp2515-can2-overlay.dts
+sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
+sudo python3 -m pip install --force-reinstall adafruit-blinka  
+sudo pip3 install rpi_ws281x  
+
 ```
 
-Create a file named mcp2515-can4-overlay.dts with following content:
+You can use the provided minimum example **led.py** to test your setup: https://github.com/Monsterrhino/MonsterrhinoControl/python3_examples
+
+[![500](http://img.youtube.com/vi/sliHqhePpDA/0.jpg)](http://www.youtube.com/watch?v=sliHqhePpDA "Controlling Monsterrhino RGB LED")
+
+
+## Install CAN bus driver on SPI2
+
+This step should be performed before installing the display driver, make sure you have the IP address of the Raspberry Pi (type ``` ifconfig ``` into the terminall to see the IP address), because after installing the display driver the HDMI will not work anymore, and you need to access the RPi via SSH (enable SSH first).
+
+### Option 1
+
+Simply download a Raspberry Pi **image** where the CAN (or CAN and display) is already set up and burn it to an SD card as described in under the first point. 
+
+You can test the MonsterrhinoControl to MonsterrhinoMotion CAN connection right away with the provided minimal Python3 example **can_func.py** that you find here: https://github.com/Monsterrhino/MonsterrhinoControl/python3_examples
+
+If you have a working CAN connection you should see the CAN Tx/Rx LEDs blink on the MonsterrhinoMotion and the Motor 1 should turn:
+
+[![500](http://img.youtube.com/vi/5juU6CXMVWE/0.jpg)](http://www.youtube.com/watch?v=5juU6CXMVWE "Move relative over CAN")
+
+
+### Option 2
+
+Download the necessary overlay files from https://github.com/Monsterrhino/MonsterrhinoControl/overlays and place them in the ``` boot/overlays/``` folder:
+```C++
+sudo rm /boot/overlays/spi1-3cs.dtbo
+sudo cp spi1-3cs.dtbo /boot/overlays/
+```
+
+And place the file **mcp2515-can4.dtbo** in the ``` boot/overlays/``` folder.
+<br><br>
+
+Open following file in the terminal by running ```sudo nano /boot/config.txt``` and add following lines at the end of the file:
+
+```C++
+dtoverlay=mcp2515-can4,oscillator=16000000,interrupt=25
+dtoverlay=spi1-3cs,cs2_spidev=disabled
+```
+
+Save with Ctrl + O and then close with Ctrl + X. &nbsp;
+<br><br>
+
+**Install CAN utilites** and reboot the Raspberry Pi:
+
+```C++
+sudo apt-get install can-utils   
+```
+Initiate and test CAN:
+
+```C++
+sudo ip link set can0 up type can bitrate 1000000
+```
+Check CAN connection:
+
+```C++
+sudo ip -details -statistics link show can0 
+```
+now type in the terminal:
+
+```C++
+ifconfig
+```
+
+and you should see:
+
+```C++
+can0: flags=193<UP,RUNNING,NOARP>  mtu 16
+        unspec 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00  txqueuelen 10  (UNSPEC)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0  
+```
+
+Use ```dmesg | grep -i spi``` to diagnose the SPI interface, the output should be:
+
+```C++
+[    0.316068] spi-bcm2835 fe204000.spi: could not get clk: -517
+[    0.450159] 4d-hats spi0.0: 4d-hat registered, product code = b3
+[    4.673633] mcp251x spi1.2 can0: MCP2515 successfully initialized.
+```
+It might be necessary to add following to ```sudo nano /etc/modules```:
+```
+can
+```
+
+### Option 3
+
+Compile the overlay files by your self as described:
+
+Create a file named **mcp2515-can4-overlay.dts** with following content:
 
 ```C++
 /*
@@ -116,8 +189,6 @@ dtc -O dtb -o mcp2515-can4.dtbo -b 0 -@ mcp2515-can4-overlay.dts
 ```
 
 Place the file mcp2515-can4.dtbo in /boot/overlays/.
-
-&nbsp;
 
 The touch display uses GPIO PIN 17 as interrupt (PENIRQ) for the touch screen, however this pin is also used as chip enable 1 (SPI1_CE1) for the SPI1 port. The CAN bus uses SPI1 with SPI1_CE2, so there is no need for GPIO 17, therefore we will use a modified driver that does not address this pin.
 Next create a file named spi1-3cs-overlay.dts with following content:
@@ -273,9 +344,29 @@ can
 ```
 
 
-# CAN bus communication
+## Install **gen4-4dpi-50ct-clb** display driver 
 
-## How to compose a CAN message for the MonsterrhinoMotion card
+The 5" display is manifactured by 4D Systems, the product number is: GEN4-4DPi-50CT-CLB. The install instruction can be found here: https://4dsystems.com.au/mwdownloads/download/link/id/198/
+
+Different versions are available here: https://4dsystems.com.au/gen4-4dpi-50ct-clb
+
+The instruction contains the download link to the install package: https:/4dsystems.com.au/media/downloads/4DPi/All/gen4-hats_4-19-97.tar.gz
+
+Download this package to the host PC, make sure the kernel of your Raspian matches the driver (e.g. 4-19-97). To check the kernel on your Raspian system type: uname -a
+
+Now we want to send the downloaded package to the Raspberry Pi. To do so navigate on the host PC to the download section and enter following into the terminal:
+
+scp gen4-hats_4-19-97.tar.gz pi@192.168.32.111:/home/pi
+
+On the remote SSH terminal navigate to cd /home/pi and enter sudo tar -xzvf gen4-hats_4-19-97.tar.gz -C /
+
+After installation poweroff the Raspberry Pi by typing: sudo poweroff. Disconnect from power and connect the display as instructed by the manual and restart the the Raspberry Pi. Now you should see the terminal on the 5" display.
+
+
+
+## CAN bus communication
+
+### How to compose a CAN message for the MonsterrhinoMotion card
 Commands can also be send over the CAN bus, therefore it is necessary to set the correct bits in the CAN frame.Following a description of the bits within the CAN frame.
 
 	21-28 ID  (8 Bit 0-255 0=broadcast 1-9 Bus controller )
