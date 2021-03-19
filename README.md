@@ -23,6 +23,12 @@ You can use the provided minimum example **led.py** to test your setup: https://
 
 ## Install **gen4-4dpi-50ct-clb** display driver 
 
+### Option 1
+
+Simply download a Raspberry Pi **image** where the  CAN and display is already set up and burn it to an SD card as described in under the first point.
+
+### Option 2
+
 Installing this driver can brake your installation! Before you try this back up all important files and install it before the CAN installation. The best is to start from a clean install of Raspian, we tried many version of Raspian, now Raspberry Pi OS, however the only one that did not cause trable during installation can be found here: **http://downloads.raspberrypi.org/raspbian_latest**. It is the **kernel version 4.19.97**.
 
 The 5" display is manifactured by 4D Systems, the product number is: GEN4-4DPi-50CT-CLB. The install instruction can be found here: https://4dsystems.com.au/mwdownloads/download/link/id/198/
