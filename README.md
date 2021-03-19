@@ -2,7 +2,7 @@
 
 # Prepare your Raspberry Pi 4 for using with Monsterrhino Control 
 
-Download Raspberry Pi Desktop from https://www.raspberrypi.org/software/raspberry-pi-desktop/. Make sure you have a version that is supported by the touch display driver (https://4dsystems.com.au/gen4-4dpi-50ct-clb). Use a program of your choice (e.g. Raspberry Pi Imager, BalenaEtcher - **attention your image might not work due to the choosen software to burn the image!**) to burn the Raspberry Pi Destop image to a SD card.
+Download Raspberry Pi Desktop from https://www.raspberrypi.org/software/raspberry-pi-desktop/. Make sure you have a version that is supported by the touch display driver (https://4dsystems.com.au/gen4-4dpi-50ct-clb). Use a program of your choice (e.g. Raspberry Pi Imager, BalenaEtcher - **attention your image might not work due to the choosen software to burn the image!**) to burn the Raspberry Pi Destop image to a SD card. You can check the kernel version of your Raspian installation by typing ``` uname -a``` into a terminal, select the display driver accordingly. 
 
 Depending on what you need you can either install both, display driver and CAN driver, or just the one you need.
 
@@ -20,6 +20,26 @@ sudo pip3 install rpi_ws281x
 You can use the provided minimum example **led.py** to test your setup: https://github.com/Monsterrhino/MonsterrhinoControl/python3_examples
 
 [![500](http://img.youtube.com/vi/sliHqhePpDA/0.jpg)](http://www.youtube.com/watch?v=sliHqhePpDA "Controlling Monsterrhino RGB LED")
+
+## Install **gen4-4dpi-50ct-clb** display driver 
+
+Installing this driver can brake your installation! Before you try this back up all important files and install it before the CAN installation. The best is to start from a clean install of Raspian, we tried many version of Raspian, now Raspberry Pi OS, however the only one that did not cause trable during installation can be found here: **http://downloads.raspberrypi.org/raspbian_latest**. It is the **kernel version 4.19.97**.
+
+The 5" display is manifactured by 4D Systems, the product number is: GEN4-4DPi-50CT-CLB. The install instruction can be found here: https://4dsystems.com.au/mwdownloads/download/link/id/198/
+
+Different versions of the driver are available here: https://4dsystems.com.au/gen4-4dpi-50ct-clb
+
+The instruction contains the download link to the install package matching the kernel described above: https:/4dsystems.com.au/media/downloads/4DPi/All/gen4-hats_4-19-97.tar.gz
+
+Download this package to the host PC, make sure the kernel of your Raspian matches the driver (e.g. 4-19-97). To check the kernel on your Raspian system type: ```uname -a``` or ```uname -r```
+
+If you use the Raspberry Pi via SSH send the downloaded package now to the Raspberry Pi. To do so navigate on the host PC to the download section and enter following into the terminal:
+
+scp gen4-hats_4-19-97.tar.gz pi@192.168.32.111:/home/pi
+
+On the remote SSH terminal navigate to ```cd /home/pi``` and enter ```sudo tar -xzvf gen4-hats_4-19-97.tar.gz -C /```
+
+After installation poweroff the Raspberry Pi by typing: ```sudo poweroff```. Disconnect from power and connect the display as instructed by the manual and restart the the Raspberry Pi. Now you should see the terminal on the 5" display. Further instructions can be found in the manual of the manufacturer mentioned above. 
 
 
 ## Install CAN bus driver on SPI2
@@ -97,10 +117,13 @@ Use ```dmesg | grep -i spi``` to diagnose the SPI interface, the output should b
 [    0.450159] 4d-hats spi0.0: 4d-hat registered, product code = b3
 [    4.673633] mcp251x spi1.2 can0: MCP2515 successfully initialized.
 ```
-It might be necessary to add following to ```sudo nano /etc/modules```:
+
+To run the minimal python example provided you need to install following Python packages:
+```C++
+sudo pip3 install python-can
+sudo pip3 install bitstring
 ```
-can
-```
+
 
 ### Option 3
 
@@ -344,27 +367,11 @@ can
 ```
 
 
-## Install **gen4-4dpi-50ct-clb** display driver 
-
-The 5" display is manifactured by 4D Systems, the product number is: GEN4-4DPi-50CT-CLB. The install instruction can be found here: https://4dsystems.com.au/mwdownloads/download/link/id/198/
-
-Different versions are available here: https://4dsystems.com.au/gen4-4dpi-50ct-clb
-
-The instruction contains the download link to the install package: https:/4dsystems.com.au/media/downloads/4DPi/All/gen4-hats_4-19-97.tar.gz
-
-Download this package to the host PC, make sure the kernel of your Raspian matches the driver (e.g. 4-19-97). To check the kernel on your Raspian system type: uname -a
-
-Now we want to send the downloaded package to the Raspberry Pi. To do so navigate on the host PC to the download section and enter following into the terminal:
-
-scp gen4-hats_4-19-97.tar.gz pi@192.168.32.111:/home/pi
-
-On the remote SSH terminal navigate to cd /home/pi and enter sudo tar -xzvf gen4-hats_4-19-97.tar.gz -C /
-
-After installation poweroff the Raspberry Pi by typing: sudo poweroff. Disconnect from power and connect the display as instructed by the manual and restart the the Raspberry Pi. Now you should see the terminal on the 5" display.
 
 
 
-## CAN bus communication
+
+## CAN bus communication protocol
 
 ### How to compose a CAN message for the MonsterrhinoMotion card
 Commands can also be send over the CAN bus, therefore it is necessary to set the correct bits in the CAN frame.Following a description of the bits within the CAN frame.
