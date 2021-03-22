@@ -21,6 +21,13 @@ You can use the provided minimum example **led.py** to test your setup: https://
 
 [![500](http://img.youtube.com/vi/sliHqhePpDA/0.jpg)](http://www.youtube.com/watch?v=sliHqhePpDA "Controlling Monsterrhino RGB LED")
 
+-----------------------------------------------------------------
+**Attention**
+Programs to control the Monsterrhino LED need to be executed as **root** e.g. run the example led program in a terminal:  
+```C++
+sudo python3 led.py 
+```
+
 ## Install **gen4-4dpi-50ct-clb** display driver 
 
 ### Option 1
