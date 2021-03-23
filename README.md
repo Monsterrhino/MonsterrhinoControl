@@ -6,6 +6,16 @@ Download Raspberry Pi Desktop from https://www.raspberrypi.org/software/raspberr
 
 Depending on what you need you can either install both, display driver and CAN driver, or just the one you need.
 
+## Download preinstalled images
+You can download the already setup images from our FTP server:
+
+* **Running Windows:** open a **File explorer** window and copy following into the address line:
+  ``` ftp://monsterrhino: F3voxLdA@217.199.10.233/``` 
+  You will be prompted to enter following password: **F3voxLdA**
+  After successfully accessing the folder you can download either the image with touch display driver and CAN driver installed (**only** the touch display works here - no monitor) or only CAN driver installed.
+
+
+
 ## Install Monsterrhino RGB LED
 
 To enable the use of your Monsterrhino RGB LED in compination with the Monsterrhino Contorl run following commands in a terminal to install the necessary packages:
@@ -14,7 +24,6 @@ To enable the use of your Monsterrhino RGB LED in compination with the Monsterrh
 sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 sudo python3 -m pip install --force-reinstall adafruit-blinka  
 sudo pip3 install rpi_ws281x  
-
 ```
 
 You can use the provided minimum example **led.py** to test your setup: https://github.com/Monsterrhino/MonsterrhinoControl/python3_examples
@@ -32,7 +41,7 @@ sudo python3 led.py
 
 ### Option 1
 
-Simply download a Raspberry Pi **image** where the  CAN and display is already set up and burn it to an SD card as described in under the first point.
+Simply download a Raspberry Pi **image** where the CAN and display is already set up and burn it to an SD card as described in under the first point.
 
 ### Option 2
 
